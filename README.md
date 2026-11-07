@@ -1,66 +1,58 @@
-# Safe Plex for Kia/Hyundai Gen5W
+# SAFE PLEX for Kia/Hyundai Gen5W
 
-Private, reproducible compatibility patches for Plex Android `6.17.1.5294` on the 2022 US Kia EV6 Gen5W head unit (Android 4.4.2 / API 19).
+> [!CAUTION]
+> **PARKED USE ONLY.** SAFE PLEX is designed only for a fully stopped vehicle in Park. Video use may be restricted or illegal in your jurisdiction, including where this mod was developed. Do not remove, weaken, or bypass its Park safeguards. You are responsible for lawful and safe use.
 
-> **Safety status:** playback works while parked, but the independent HMG Park Guard is **not implemented yet**. Do not use video while the vehicle is moving. The intended release gate is fail-closed enforcement that force-stops `com.plexapp.android` unless fresh vehicle telemetry explicitly confirms Park.
+Private Plex Android `6.17.1.5294` compatibility build and HMG-API Park Guard for the 2022 US Kia EV6 Gen5W head unit (Android 4.4.2 / API 19).
 
-## What this fixes
+**Safety status:** the independent fail-closed guard and HMG package are implemented, installed on the vehicle, and host-verified. The Plex compatibility APK has been exercised on the physical car while parked, and the guard has been physically confirmed to kill Plex on both Park → Reverse and Park → Drive. The remaining physical matrix (launch-while-unsafe survival, background/deep-link termination, head-unit reboot recovery, measured event-to-stop latency, and no-collateral-kill confirmation) is tracked in `docs/device-validation.md` before SAFE PLEX can be called fully vehicle-validated.
 
-The reviewed upstream APK is preserved outside Git and pinned by SHA-256. The build pipeline makes four scoped changes:
+## Safety architecture
 
-1. Adds `android.permission.GET_TASKS`, required by this OEM firmware even when Plex calls `Activity.finish()`.
-2. Replaces Plex's 2011 embedded CA bundle with reviewed Mozilla CA data dated 2026-11-05. Certificate verification remains enabled.
-3. Adds `FLAG_FULLSCREEN` to both Plex mobile video-player activities so Gen5W removes its 90-pixel status-bar inset.
-4. Re-signs the private build with a stable owner-controlled key using an Android 4.4-compatible v1 signature.
+SAFE PLEX uses two independent layers:
+
+1. HMG-API `not_while_driving`, which follows the head unit's stock driving regulation and popup.
+2. A separate root `safe-plex-guard` service. It permits Plex only after `gear.park=1`, `moving=0`, `abs(speed)<=0.5 km/h`, and `driving.restricted=0` remain valid for 1.5 seconds. Unsafe, contradictory, malformed, missing, or stale readings immediately block Plex. While blocked, the guard repeats `am force-stop com.plexapp.android` once per second and has an exact-package `/proc` kill fallback for Plex child processes.
+
+The guard reads exactly those four compile-time telemetry names from HMG-API 1.0.2's root-peer-only internal vehicle socket. It returns after all four exact lines arrive rather than waiting for EOF, avoiding the physically observed three-second public-client EOF timeout. This path bypasses `hmgapid` declaration checks and request audit logging, so the descriptor remains narrowly gated and later HMG versions require physical validation. An incompatible protocol fails closed.
+
+## Plex compatibility changes
+
+The reviewed upstream APK is patched to:
+
+1. Add `android.permission.GET_TASKS`, required by this OEM firmware even when Plex calls `Activity.finish()`.
+2. Replace Plex's 2011 embedded CA bundle with reviewed Mozilla CA data dated 2026-11-05. Certificate verification remains enabled.
+3. Add `FLAG_FULLSCREEN` to both Plex mobile video-player activities so Gen5W removes its 90-pixel status-bar inset.
+4. Use a stable owner-controlled Android 4.4-compatible app signature.
 
 It does **not** zoom, stretch, or crop video. A 16:9 picture remains 16:9 on the wider 1920×720 display.
 
-## Repository boundaries
+## Compatibility gate
 
-Committed:
+The HMG mod intentionally accepts only:
 
-- The exact private, vehicle-tested APK at `artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk`
+- Model: `CVEV`
+- Region: `USA`
+- Firmware: `260507`
+- HMG-API: exactly `1.0.2`, whose internal vehicle protocol is the reviewed and Safe-VLC-validated baseline
+- Android: Gen5W Android 4.4.2 / API 19
 
-Not committed:
+Do not loosen this gate for another vehicle or firmware. Add and physically validate a separate profile.
 
-- The unmodified upstream Plex APK or decompiled Plex source/resources
-- Signing keys or password files
-- Plex passwords, MFA codes, account tokens, or app data
-- Device screenshots and logs
+## Private APK
 
-See `NOTICE.md` and `.gitignore`.
-
-## Reviewed input
-
-Supply the original standalone ARMv7 APK yourself:
-
-```text
-Plex 6.17.1.5294
-package: com.plexapp.android
-minSdk: 16
-SHA-256: 31b2d5312a0f81627c2831fc1bd376ba149583166d06dab281001a53b068ef0c
-```
-
-The build refuses any other upstream digest.
-
-## Prebuilt private APK
-
-The exact vehicle-tested build is available to authorized repository members:
+The exact parked-playback-tested build is committed for authorized repository members:
 
 ```text
 artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
 SHA-256: d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f
 ```
 
-It is signed with the private `Aperture Plex Car Test` key. Keep this repository private; do not redistribute the APK.
+Keep this repository private; do not redistribute the APK. The unmodified upstream APK, signing keys, passwords, MFA codes, Plex tokens, app data, device screenshots, and logs are not committed.
 
-## Build
+## Build the Plex compatibility APK
 
-Requirements:
-
-- Python 3.9+
-- Java 17+
-- Apktool 3.0.3
+Requirements: Python 3.9+, Java 17+, and Apktool 3.0.3.
 
 ```bash
 ./scripts/build.sh \
@@ -68,56 +60,53 @@ Requirements:
   --apktool /private/path/apktool_3.0.3.jar
 ```
 
-The unsigned result is written under `dist/` by default.
+Sign with the dedicated private key using `scripts/sign.sh`. Android 4.4 requires the v1 signature; same-key updates preserve Plex authentication and app data.
 
-## Sign
+## Test and build the HMG mod
 
-Keep the dedicated keystore and its password files outside the repository.
+Prerequisites:
 
-```bash
-./scripts/sign.sh \
-  --apk dist/Plex-6.17.1.5294-EV6-unsigned.apk \
-  --out dist/Plex-6.17.1.5294-EV6-signed.apk \
-  --build-tools "$ANDROID_HOME/build-tools/36.0.0" \
-  --keystore "$HOME/hmg-private/keys/plex-car-test.p12" \
-  --alias plex-car-test \
-  --store-pass-file "$HOME/hmg-private/keys/plex-car-test.pass" \
-  --key-pass-file "$HOME/hmg-private/keys/plex-car-test-key.pass"
-```
-
-Android 4.4 validates the v1 signature. Same-key updates preserve Plex authentication and app data.
-
-## Tests
+- Exact clean HMG-API commit `180185de2c57afb2cca4858d0be7828e8f1051d6`
+- JDK 17
+- Android SDK platform and build-tools 36.0.0
+- Established HMG author key and paired `.pub` file outside this repository
 
 ```bash
-python3 -m unittest discover -s tests -v
+python3 tools/test_all.py
+python3 tools/build_mod.py \
+  --hmg-source /opt/data/projects/Ev6/HMG-API \
+  --author-key /opt/data/private-keys/safe-vlc/author.key
 ```
 
-For a physical playback session, dump the UI hierarchy and verify the video surface uses the full 720-pixel display height:
+Outputs:
 
-```bash
-python3 tests/assert_video_fullscreen.py playback-ui.xml
-```
+- `dist/geekd4dlabs-safe-plex-0.1.0.zip` — signed HMG mod
+- `dist/geekd4dlabs-safe-plex-0.1.0-usb.zip` — USB-root archive
+- `dist/VERIFICATION.json`
+- `dist/SHA256SUMS.txt`
+
+The builder verifies the Plex APK's package, version, API, ABI, launcher, app-signing certificate, exact bytes, service dex JAR, HMG signature, nested USB archive, and descriptor.
 
 ## Current physical validation
 
-Verified on the target EV6 while parked:
+Verified while parked on the target EV6:
 
-- Installation and launch
-- Plex account login with Plex's legacy MFA format (`password` followed immediately by the current six-digit code)
-- Library access
-- Video playback
-- Correct 16:9 aspect ratio
-- Full-height player with the OEM top bar removed
-- Updated CA bundle with no `libcurl` error 60
+- Plex installs and launches
+- Account login works using Plex's legacy MFA format (`password` followed immediately by the current six-digit code)
+- Library access and video playback work
+- Correct 16:9 aspect ratio and full-height player
+- Updated CA bundle removes `libcurl` certificate error 60
 
-Not yet validated or implemented:
+Verified on the physical EV6 with the Park Guard installed:
 
-- HMG packaging
-- Strict Park-only supervisor
-- Park → Reverse/Drive shutdown latency
-- Background-playback termination
-- Telemetry-loss fail-closed behavior
-- Reboot/recovery validation
+- Shifting Park → Reverse kills Plex
+- Shifting Park → Drive kills Plex
 
-See `docs/device-validation.md` for the acceptance gate.
+The HMG guard package is **host-built and structurally verified, and the two primary gear-transition kill paths are now physically confirmed**. Remaining vehicle checks (launch-while-unsafe survival, background/deep-link termination, reboot recovery, measured latency, and no-collateral-kill confirmation) are tracked in `docs/device-validation.md`.
+
+## Provenance and licensing
+
+- Plex is proprietary to Plex, Inc.; see `NOTICE.md`.
+- The Park Guard is adapted from the physically validated private SAFE VLC implementation at commit `2953cf3d2021ecb7022c02992f335fcf2521cf7b`.
+- HMG-API: https://github.com/VysseCodes/HMG-API, AGPL-3.0.
+- SAFE PLEX guard source: AGPL-3.0-or-later.
