@@ -12,7 +12,7 @@ CA source: `https://curl.se/ca/cacert.pem`, Mozilla data dated 2026-11-05.
 ## Vehicle-tested private build
 
 ```text
-d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f  Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
+d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f  artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
 ```
 
-The APK itself is deliberately excluded from Git. It was signed with the dedicated private `Aperture Plex Car Test` key. The key and password files must remain outside this repository.
+The APK is stored at `artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk` in this private repository. It was signed with the dedicated private `Aperture Plex Car Test` key. The key and password files must remain outside this repository.

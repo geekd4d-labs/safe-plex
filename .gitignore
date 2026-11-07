@@ -3,6 +3,7 @@
 
 # Proprietary inputs and generated APKs
 *.apk
+!artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
 *.apks
 *.xapk
 dist/

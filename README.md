@@ -17,9 +17,13 @@ It does **not** zoom, stretch, or crop video. A 16:9 picture remains 16:9 on the
 
 ## Repository boundaries
 
+Committed:
+
+- The exact private, vehicle-tested APK at `artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk`
+
 Not committed:
 
-- Plex APKs or decompiled Plex source/resources
+- The unmodified upstream Plex APK or decompiled Plex source/resources
 - Signing keys or password files
 - Plex passwords, MFA codes, account tokens, or app data
 - Device screenshots and logs
@@ -38,6 +42,17 @@ SHA-256: 31b2d5312a0f81627c2831fc1bd376ba149583166d06dab281001a53b068ef0c
 ```
 
 The build refuses any other upstream digest.
+
+## Prebuilt private APK
+
+The exact vehicle-tested build is available to authorized repository members:
+
+```text
+artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
+SHA-256: d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f
+```
+
+It is signed with the private `Aperture Plex Car Test` key. Keep this repository private; do not redistribute the APK.
 
 ## Build
 
