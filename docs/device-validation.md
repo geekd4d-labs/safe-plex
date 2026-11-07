@@ -63,3 +63,45 @@ Mod SHA-256: c1e917476bac28e3fa728ac996bf70d3cf16844928c4c0e624cd4be851014f6b
 ```
 
 Remaining gaps before calling the gear-transition matrix complete: cannot-survive launch while already in Reverse/Drive, background/deep-link playback after shifting out of Park, head-unit reboot recovery, measured event-to-stop latency, and confirmation no unrelated process is affected during the shift tests.
+
+## Standalone build (NEMESIS, HMG-API independent)
+
+The standalone package ships the same unmodified EV6 Plex APK plus a root
+guard service (NEMESIS `kind=sh`, `uid=root`, `mode=restart`) that runs
+`StandaloneGuard` under `app_process`. Telemetry comes from the head unit's
+own factory binders — the same services the EV6 Plex video gate uses:
+
+- `ISystemService.getGearPStatus()` via `/system/framework/automotive.jar`
+- `ITM_HSCANService.getCarSpeed(0)` / `IsCarMoving()` via
+  `/system/framework/com.hkmc.ext.hcan.jar`
+- `IRegulationManager.getStatus()` via `/system/framework/automotive.jar`
+
+Policy, debounce (1.5 s), enforcement latch, and the enforcement cascade
+(`am force-stop` → `/proc` fallback) are byte-identical to the HMG guard:
+`StandaloneGuard` reuses `SafePlexGuard.enforcePlexStopped()`. Only the
+telemetry source changed. Unanswered readings are reported as `-` and the
+service cache is dropped, so the next poll rebinds from scratch.
+
+### Host-verified (standalone)
+
+- [x] Telemetry mapping is fail-closed: any missing/throwing reading reports `-` and blocks (16 host cases, including the 0/1 policy-encoding contract)
+- [x] `StandaloneGuard` reuses the HMG guard's policy constants and enforcement path
+- [x] Guard jar compiles to a single deterministic `classes.dex` containing both standalone classes
+- [x] NEMESIS descriptor contract: app + root service, correct paths, `restart` mode
+- [x] Guard script: API 19 + vehicle-framework preflight, boot-id/pid double-start lock, `cleanup` force-stops Plex
+- [x] NEMESIS package and nested USB archive verify recursively; ZIP bytes deterministic
+- [x] Shell scripts ship with LF line endings only
+
+### Required physical tests (standalone)
+
+First run must treat the binder path as unvalidated on this unit:
+
+- [ ] logcat shows `started fail-closed supervisor (standalone; factory vehicle telemetry)`
+- [ ] Confirmed parked (P, stopped): Plex launches and plays video
+- [ ] Park → Reverse/Drive stops visible playback; relaunch blocked until fresh Park debounces
+- [ ] Launch while already in Reverse/Drive cannot survive
+- [ ] Background playback is terminated after shifting out of Park
+- [ ] File/deep-link launch is terminated while out of Park
+- [ ] Head-unit reboot recovers fail-closed (guard restarts via NEMESIS, Plex stays blocked until Park)
+- [ ] No unrelated package/process is killed during the shift tests
+- [ ] Uninstall via NEMESIS stops the guard, force-stops Plex, and removes `/data/local/safe-plex`

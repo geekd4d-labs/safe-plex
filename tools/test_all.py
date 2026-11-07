@@ -17,6 +17,7 @@ def main():
     run("python3", "-m", "unittest", "discover", "-s", "tests", "-v")
     run("python3", "tools/test_integration.py")
     run("python3", "tools/test_packaging.py")
+    run("python3", "tools/test_standalone.py")
     if BUILD.exists():
         shutil.rmtree(BUILD)
     BUILD.mkdir(parents=True)
@@ -28,10 +29,11 @@ def main():
         package / "ProcessDeadline.java",
         package / "ProcessName.java",
         package / "VehicleResponse.java",
+        package / "FactoryVehicleTelemetry.java",
     ]
     tests = sorted((ROOT / "service/test").rglob("*.java"))
     run(JDK / "bin/javac", "--release", "8", "-Xlint:-options", "-nowarn", "-d", BUILD, *production, *tests)
-    for test in ["SafetyPolicyTest", "ParkStateTest", "EnforcementLatchTest", "ProcessDeadlineTest", "ProcessNameTest", "VehicleResponseTest"]:
+    for test in ["SafetyPolicyTest", "ParkStateTest", "EnforcementLatchTest", "ProcessDeadlineTest", "ProcessNameTest", "VehicleResponseTest", "FactoryVehicleTelemetryTest"]:
         run(JDK / "bin/java", "-cp", BUILD, "dev.geekd4dlabs.safeplex." + test)
 
 
