@@ -1,0 +1,32 @@
+# CI workflow is retained locally until the worker OAuth token gains workflow scope
+.github/workflows/
+
+# Proprietary inputs and generated APKs
+*.apk
+*.apks
+*.xapk
+dist/
+.work/
+build/
+
+# Private signing material
+*.jks
+*.keystore
+*.p12
+*.pfx
+*.pass
+*.password
+
+# Device/auth evidence
+*.log
+*.png
+*.xml.dump
+*.token
+
+# Python/editor noise
+__pycache__/
+*.py[cod]
+.venv/
+.idea/
+.vscode/
+.DS_Store
