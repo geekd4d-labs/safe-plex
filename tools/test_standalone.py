@@ -23,8 +23,10 @@ def read(path):
 
 
 def check_nemesis_data():
+    raw = read(SRC / "NEMESIS.data")
+    assert b"\r\n" not in raw, "NEMESIS.data has CRLF line endings"
     parser = configparser.ConfigParser(strict=True)
-    parser.read_string(read(SRC / "NEMESIS.data").decode())
+    parser.read_string(raw.decode())
     assert parser.get("nemesis", "id") == ID
     assert parser.get("nemesis", "name") == "SAFE PLEX"
     assert parser.get("nemesis", "type") == "application,service"
@@ -43,8 +45,10 @@ def check_nemesis_data():
 
 
 def check_usb_nemesis_data():
+    raw = read(SRC / "USB-NEMESIS.data")
+    assert b"\r\n" not in raw, "USB-NEMESIS.data has CRLF line endings"
     parser = configparser.ConfigParser(strict=True)
-    parser.read_string(read(SRC / "USB-NEMESIS.data").decode())
+    parser.read_string(raw.decode())
     assert parser.get("nemesis", "type") == "install"
     assert parser.get("nemesis", "path") == f"Packages/{ID}.zip"
 

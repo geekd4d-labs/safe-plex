@@ -244,7 +244,9 @@ def main():
         (stage / "app").mkdir(parents=True)
         (stage / "guard").mkdir()
         (stage / "scripts").mkdir()
-        (stage / "NEMESIS.data").write_text(nemesis_source)
+        # copyfile: byte-exact. write_text would re-encode line endings
+        # (CRLF on Windows), corrupting the NEMESIS descriptor on-device.
+        shutil.copyfile(STANDALONE / "src" / "NEMESIS.data", stage / "NEMESIS.data")
         shutil.copyfile(apk, stage / "app" / "Plex.apk")
         shutil.copyfile(guard_jar, stage / "guard" / "safeplex-guard.jar")
         shutil.copyfile(STANDALONE / "src" / "guard" / "safeplex-guard.sh",
