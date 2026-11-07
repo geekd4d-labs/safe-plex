@@ -27,9 +27,15 @@ def sha256(path):
 
 
 def run(*args, env=None):
+    cmd = [str(a) for a in args]
+    if os.name == "nt" and not Path(cmd[0]).suffix:
+        for suffix in (".bat", ".cmd"):
+            if Path(cmd[0] + suffix).is_file():
+                cmd = ["cmd", "/c", cmd[0] + suffix, *cmd[1:]]
+                break
     try:
         result = subprocess.run(
-            [str(a) for a in args], check=True, text=True,
+            cmd, check=True, text=True,
             stdout=subprocess.PIPE, stderr=subprocess.STDOUT, env=env,
         )
     except subprocess.CalledProcessError as error:
