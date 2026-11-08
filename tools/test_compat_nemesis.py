@@ -23,7 +23,11 @@ class CompatNemesisTest(unittest.TestCase):
         self.assertEqual(parser.get("nemesis", "id"), "plex.geekd4dlabs.compat-test")
         self.assertEqual(parser.get("nemesis", "name"), "PLEX COMPAT TEST (GUARDED)")
         self.assertEqual(parser.get("nemesis", "types"), "application,service")
-        self.assertEqual(parser.get("nemesis", "package-version"), "0.1.2")
+        self.assertEqual(
+            parser.get("nemesis", "package-version"),
+            (PROFILE / "VERSION").read_text().strip(),
+            "NEMESIS.data package-version must track nemesis-test/VERSION",
+        )
         self.assertLessEqual(len(parser.get("nemesis", "short-desc")), 64)
         self.assertEqual(parser.get("app.0", "package"), "com.plexapp.android")
         self.assertEqual(parser.get("service.0", "name"), "plex-compat-test-guard")
@@ -33,21 +37,22 @@ class CompatNemesisTest(unittest.TestCase):
             "com.plexapp.android/com.plexapp.plex.activities.SplashActivity",
         )
 
-    def test_apk_profile_is_fullscreen_compatibility_build(self):
+    def test_apk_profile_is_fullscreen_audio_source_compatibility_build(self):
         self.assertEqual(
             self.builder.PLEX_SHA256,
-            "d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f",
+            "bdd746d124a3efb3c86ca841c93ec5c2cae599b8c736ec66d96420b5971a3e7b",
         )
         self.assertEqual(self.builder.NEMESIS_ID, "plex.geekd4dlabs.compat-test")
         self.assertEqual(
             self.builder.DEFAULT_APK.name,
-            "Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk",
+            "Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026-AUDIOSRC.apk",
         )
         readme = (PROFILE / "README-PRIVATE-TEST.txt").read_text()
         self.assertIn("GET_TASKS", readme)
         self.assertIn("CA bundle", readme)
         self.assertIn("includes the fullscreen patch", readme)
         self.assertIn("Park Guard remains mandatory", readme)
+        self.assertIn("audio source", readme.lower())
 
     def test_usb_descriptor_targets_only_the_separate_package(self):
         parser = configparser.ConfigParser(strict=True)

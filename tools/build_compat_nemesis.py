@@ -9,9 +9,9 @@ PROFILE = ROOT / "nemesis-test"
 NEMESIS_ID = "plex.geekd4dlabs.compat-test"
 NEMESIS_NAME = "PLEX COMPAT TEST (GUARDED)"
 SERVICE_NAME = "plex-compat-test-guard"
-PLEX_SHA256 = "d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f"
+PLEX_SHA256 = "bdd746d124a3efb3c86ca841c93ec5c2cae599b8c736ec66d96420b5971a3e7b"
 PLEX_CERT_SHA256 = "b7c45789ad339affaecd51ef6be24c63786df75e9c273ac951b1cd1d755c2be0"
-DEFAULT_APK = ROOT / "artifacts" / "Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk"
+DEFAULT_APK = ROOT / "artifacts" / "Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026-AUDIOSRC.apk"
 
 
 def load_base():
@@ -29,8 +29,8 @@ def load_base():
         "DIST_PREFIX": "plex-compat-test-guarded",
         "REPORT_SUFFIX": "compat-nemesis-test",
         "BUILD_LABEL": (
-            "Plex compatibility APK with fullscreen plus standalone Park Guard "
-            "(NEMESIS package, no HMG-API dependency)"
+            "Plex compatibility APK with fullscreen and audio-source retention plus "
+            "standalone Park Guard (NEMESIS package, no HMG-API dependency)"
         ),
         "PLEX_SHA256": PLEX_SHA256,
         "PLEX_CERT_SHA256": PLEX_CERT_SHA256,

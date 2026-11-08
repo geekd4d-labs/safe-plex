@@ -45,6 +45,7 @@ The exact parked-playback-tested build is committed for authorized repository me
 
 ```text
 artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk
+artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026-AUDIOSRC.apk
 SHA-256: d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f
 ```
 
@@ -80,7 +81,7 @@ This is not an in-car SAFE PLEX release and must not replace either guarded dist
 
 ## Build the guarded NEMESIS compatibility test
 
-For physical head-unit testing, a separate NEMESIS package uses the established Plex compatibility APK—`GET_TASKS`, the current CA bundle, fullscreen player flags, and the stable private signature. Because it installs on a vehicle, it retains the independent standalone Park Guard; it has no HMG-API dependency.
+For physical head-unit testing, a separate NEMESIS package uses the established Plex compatibility APK—`GET_TASKS`, the current CA bundle, fullscreen player flags, audio source retention, and the stable private signature. Because it installs on a vehicle, it retains the independent standalone Park Guard; it has no HMG-API dependency.
 
 ```bash
 python3 tools/build_compat_nemesis.py
@@ -89,8 +90,8 @@ python3 tools/build_compat_nemesis.py
 Ready-to-extract USB archive:
 
 ```text
-dist/plex-compat-test-guarded-0.1.2-usb.zip
-SHA-256: 75d5c9239e2ad64f4993a5c78660e6afc60f6ba21366da7a8ca80999d9e944a1
+dist/plex-compat-test-guarded-0.1.3-usb.zip
+SHA-256: 2022df4f069ee48e3a527ece0544ea234e28e2f6cfc10d90c632060f228f2119
 ```
 
 The inner NEMESIS package is `Packages/plex.geekd4dlabs.compat-test.zip`. Do not install it alongside the HMG-API SAFE PLEX mod or the regular standalone SAFE PLEX package: all variants own `com.plexapp.android`, and concurrent guards or package managers create ambiguous uninstall and process-control behavior. Remove the previous variant through its own manager first.
