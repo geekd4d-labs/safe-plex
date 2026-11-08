@@ -62,6 +62,22 @@ Requirements: Python 3.9+, Java 17+, and Apktool 3.0.3.
 
 Sign with the dedicated private key using `scripts/sign.sh`. Android 4.4 requires the v1 signature; same-key updates preserve Plex authentication and app data.
 
+## Build the compatibility-only test archive
+
+The repository also defines a deliberately separate **bench/emulator-only** test artifact. It contains the reviewed Plex compatibility APK, its checksum, and test instructions—but no HMG-API package, NEMESIS installer, vehicle service, or Park Guard.
+
+```bash
+python3 tools/build_compat_test.py
+```
+
+Output:
+
+```text
+dist/compat-test/Plex-6.17.1.5294-EV6-COMPAT-TEST-1.zip
+```
+
+This is not an in-car SAFE PLEX release and must not replace either guarded distribution. Its archive structure is deterministic and the builder refuses APK bytes that do not match the reviewed SHA-256.
+
 ## Test and build the HMG mod
 
 Prerequisites:
