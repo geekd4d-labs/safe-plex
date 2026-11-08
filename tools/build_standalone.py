@@ -22,6 +22,10 @@ ROOT = Path(__file__).resolve().parents[1]
 STANDALONE = ROOT / "standalone"
 NEMESIS_ID = "plex.geekd4dlabs.safe"
 NEMESIS_NAME = "SAFE PLEX"
+SERVICE_NAME = "safe-plex-guard"
+DIST_PREFIX = "safe-plex-standalone"
+REPORT_SUFFIX = "standalone"
+BUILD_LABEL = "standalone (NEMESIS package, no HMG-API dependency)"
 PLEX_SHA256 = "d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f"
 PLEX_CERT_SHA256 = "b7c45789ad339affaecd51ef6be24c63786df75e9c273ac951b1cd1d755c2be0"
 PACKAGE = "com.plexapp.android"
@@ -166,7 +170,7 @@ def verify_package(package, stage, guard_jar, apk):
                     "preuninstall": "guard/preuninstall.sh"},
         "app.0": {"kind": "apk", "path": "app/Plex.apk", "package": PACKAGE,
                   "component": f"{PACKAGE}/{LAUNCHER}"},
-        "service.0": {"name": "safe-plex-guard", "kind": "sh",
+        "service.0": {"name": SERVICE_NAME, "kind": "sh",
                       "path": "guard/safeplex-guard.sh", "uid": "root",
                       "mode": "restart"},
     }
@@ -237,7 +241,7 @@ def main():
     guard_jar = build_guard_jar(sdk, build_tools, jdk, build)
 
     package_zip = dist / f"{NEMESIS_ID}.zip"
-    usb_zip = dist / f"safe-plex-standalone-{version}-usb.zip"
+    usb_zip = dist / f"{DIST_PREFIX}-{version}-usb.zip"
 
     with tempfile.TemporaryDirectory() as temporary:
         stage = Path(temporary) / "package"
@@ -266,13 +270,13 @@ def main():
     artifacts = {path.name: sha256(path) for path in (apk, guard_jar, package_zip, usb_zip)}
     report = {
         "scope": "host-built and structurally verified; NOT vehicle validated",
-        "build": "standalone (NEMESIS package, no HMG-API dependency)",
+        "build": BUILD_LABEL,
         "plex": {"sha256": PLEX_SHA256, "certificate_sha256": PLEX_CERT_SHA256},
         "guard_entry": "dev.geekd4dlabs.safeplex.StandaloneGuard",
         "artifacts": artifacts,
     }
-    (dist / "VERIFICATION-standalone.json").write_text(json.dumps(report, indent=2) + "\n")
-    (dist / "SHA256SUMS-standalone.txt").write_text(
+    (dist / f"VERIFICATION-{REPORT_SUFFIX}.json").write_text(json.dumps(report, indent=2) + "\n")
+    (dist / f"SHA256SUMS-{REPORT_SUFFIX}.txt").write_text(
         "".join(f"{digest}  {name}\n" for name, digest in artifacts.items()))
     print(json.dumps(report, indent=2))
 

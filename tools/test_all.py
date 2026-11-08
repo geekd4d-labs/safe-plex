@@ -19,6 +19,7 @@ def main():
     run("python3", "tools/test_packaging.py")
     run("python3", "tools/test_standalone.py")
     run("python3", "tools/test_compat_test.py")
+    run("python3", "tools/test_compat_nemesis.py")
     if BUILD.exists():
         shutil.rmtree(BUILD)
     BUILD.mkdir(parents=True)

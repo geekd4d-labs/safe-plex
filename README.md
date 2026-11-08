@@ -78,6 +78,23 @@ dist/compat-test/Plex-6.17.1.5294-EV6-COMPAT-TEST-1.zip
 
 This is not an in-car SAFE PLEX release and must not replace either guarded distribution. Its archive structure is deterministic and the builder refuses APK bytes that do not match the reviewed SHA-256.
 
+## Build the guarded NEMESIS compatibility test
+
+For physical head-unit testing, a separate NEMESIS package uses the established Plex compatibility APK—`GET_TASKS`, the current CA bundle, fullscreen player flags, and the stable private signature. Because it installs on a vehicle, it retains the independent standalone Park Guard; it has no HMG-API dependency.
+
+```bash
+python3 tools/build_compat_nemesis.py
+```
+
+Ready-to-extract USB archive:
+
+```text
+dist/plex-compat-test-guarded-0.1.0-usb.zip
+SHA-256: 194d7fcf1920310b0297022551645265ef0c194b0db1034c04e5141208e37232
+```
+
+The inner NEMESIS package is `Packages/plex.geekd4dlabs.compat-test.zip`. Do not install it alongside the HMG-API SAFE PLEX mod or the regular standalone SAFE PLEX package: all variants own `com.plexapp.android`, and concurrent guards or package managers create ambiguous uninstall and process-control behavior. Remove the previous variant through its own manager first.
+
 ## Test and build the HMG mod
 
 Prerequisites:
