@@ -165,7 +165,7 @@ def verify_package(package, stage, guard_jar, apk):
             shutil.rmtree(checked, ignore_errors=True)
     expect = {
         "nemesis": {"id": NEMESIS_ID, "name": NEMESIS_NAME,
-                    "type": "application,service",
+                    "types": "application,service",
                     "preinstall": "scripts/pre.sh",
                     "preuninstall": "guard/preuninstall.sh"},
         "app.0": {"kind": "apk", "path": "app/Plex.apk", "package": PACKAGE,
@@ -174,6 +174,11 @@ def verify_package(package, stage, guard_jar, apk):
                       "path": "guard/safeplex-guard.sh", "uid": "root",
                       "mode": "restart"},
     }
+    # Live NEMESIS 1.16.7 rejects the whole package when short-desc exceeds
+    # 64 characters ("invalid package metadata: short-desc is over 64").
+    short_desc = nemesis.get("nemesis", "short-desc", fallback="")
+    if len(short_desc) > 64:
+        raise ValueError(f"NEMESIS.data short-desc is {len(short_desc)} chars; max 64")
     for section, keys in expect.items():
         if not nemesis.has_section(section):
             raise ValueError(f"NEMESIS.data missing section {section}")

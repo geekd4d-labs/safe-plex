@@ -1,4 +1,4 @@
-PLEX COMPAT TEST 0.1.1 (GUARDED NEMESIS TEST)
+PLEX COMPAT TEST 0.1.2 (GUARDED NEMESIS TEST)
 ================================================
 
 PURPOSE

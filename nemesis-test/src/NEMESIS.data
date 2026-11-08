@@ -2,9 +2,9 @@
 version=1.1
 id=plex.geekd4dlabs.compat-test
 name=PLEX COMPAT TEST (GUARDED)
-type=application,service
-package-version=0.1.1
-short-desc=Plex compatibility test, blocked unless the car is confirmed parked.
+types=application,service
+package-version=0.1.2
+short-desc=Plex compatibility test; parked use only.
 detailed-desc=Installs Plex with GET_TASKS, current CA, and fullscreen compatibility changes plus the mandatory standalone Park Guard. No HMG-API dependency.
 os=any
 models=any

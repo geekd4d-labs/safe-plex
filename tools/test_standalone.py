@@ -29,7 +29,8 @@ def check_nemesis_data():
     parser.read_string(raw.decode())
     assert parser.get("nemesis", "id") == ID
     assert parser.get("nemesis", "name") == "SAFE PLEX"
-    assert parser.get("nemesis", "type") == "application,service"
+    assert parser.get("nemesis", "types") == "application,service"
+    assert len(parser.get("nemesis", "short-desc")) <= 64, "NEMESIS rejects short-desc over 64 chars"
     assert parser.get("nemesis", "preinstall") == "scripts/pre.sh"
     assert parser.get("nemesis", "preuninstall") == "guard/preuninstall.sh"
     assert parser.get("nemesis", "package-version") == (STANDALONE_SRC / "VERSION").read_text().strip()

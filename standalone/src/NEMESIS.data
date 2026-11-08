@@ -2,9 +2,9 @@
 version=1.1
 id=plex.geekd4dlabs.safe
 name=SAFE PLEX
-type=application,service
+types=application,service
 package-version=0.2.0
-short-desc=Plex for the EV6 head unit, blocked unless the car is confirmed parked.
+short-desc=Plex for the EV6; blocked unless confirmed parked.
 detailed-desc=Installs the EV6 Plex build plus a root guard service that force-stops Plex unless factory vehicle services confirm the car is in Park, stopped, and unrestricted. No HMG-API dependency.
 os=any
 models=any

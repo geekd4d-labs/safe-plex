@@ -22,6 +22,6 @@ The APK is stored at `artifacts/Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026.apk` in t
 This separate NEMESIS test uses the parked-playback-tested `GET_TASKS`, current-CA, and fullscreen APK. Its NEMESIS package retains the standalone Park Guard.
 
 ```text
-bb5b9f7f9e97eed260e18ad0069530b7c30b13973d5db60663689c56ebacc90a  dist/plex-compat-test-guarded-0.1.1-usb.zip
-43f00b37e5dace8b8dd151ef7f1ad52c7f19579f09dfce9b087878bcffd99fde  dist/plex.geekd4dlabs.compat-test.zip
+75d5c9239e2ad64f4993a5c78660e6afc60f6ba21366da7a8ca80999d9e944a1  dist/plex-compat-test-guarded-0.1.2-usb.zip
+76b77523c3ed7707b65e4dfbd3fd395baf605e84f6cab86795488d8d85475848  dist/plex.geekd4dlabs.compat-test.zip
 ```
