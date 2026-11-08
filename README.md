@@ -88,7 +88,10 @@ README.txt
 
 Insert the stick and install **SAFE PLEX** through NEMESIS, parked.
 
-Requirements: NEMESIS installed and working; Kia/Hyundai Gen5W Android 4.4.2 / API 19, 32-bit ARM; factory frameworks `/system/framework/automotive.jar` and `/system/framework/com.hkmc.ext.hcan.jar` present. Marketplace metadata marks the physically exercised EV6 260507 firmware as a full match; other CVEV firmware and US Ioniq 5 NEEV/NEEV23 model families are partial/experimental matches. Other model families are incompatible unless the user explicitly accepts NEMESIS's risk override. Missing or unreadable factory calls leave the guard blocked. Plausible readings with different vehicle-specific meanings cannot be detected automatically, so every new model/firmware needs physical gear-state validation.
+> [!IMPORTANT]
+> **Connect the head unit to Wi-Fi through NEMESIS before using Plex.** Open NEMESIS Manager, tap **WiFi**, and join a network (home Wi-Fi or a phone hotspot). Plex needs this network connection to sign in and stream; without it, Plex will not work.
+
+Requirements: NEMESIS installed and working with an active Wi-Fi connection; Kia/Hyundai Gen5W Android 4.4.2 / API 19, 32-bit ARM; factory frameworks `/system/framework/automotive.jar` and `/system/framework/com.hkmc.ext.hcan.jar` present. Marketplace metadata marks the physically exercised EV6 260507 firmware as a full match; other CVEV firmware and US Ioniq 5 NEEV/NEEV23 model families are partial/experimental matches. Other model families are incompatible unless the user explicitly accepts NEMESIS's risk override. Missing or unreadable factory calls leave the guard blocked. Plausible readings with different vehicle-specific meanings cannot be detected automatically, so every new model/firmware needs physical gear-state validation.
 
 ### Upgrading from the test package
 
