@@ -145,7 +145,7 @@ scripts/      APK patch, build, and sign tooling
 tools/        package builders and contract tests
 tests/        patcher unit tests
 artifacts/    reviewed signed APKs
-docs/         validation records and handoff notes
+docs/         vehicle validation records
 vendor/       reviewed CA bundle
 ```
 
