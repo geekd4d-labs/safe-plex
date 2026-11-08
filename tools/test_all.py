@@ -15,11 +15,8 @@ def run(*args):
 
 def main():
     run("python3", "-m", "unittest", "discover", "-s", "tests", "-v")
-    run("python3", "tools/test_integration.py")
-    run("python3", "tools/test_packaging.py")
-    run("python3", "tools/test_standalone.py")
+    run("python3", "tools/test_safe_plex.py")
     run("python3", "tools/test_compat_test.py")
-    run("python3", "tools/test_compat_nemesis.py")
     if BUILD.exists():
         shutil.rmtree(BUILD)
     BUILD.mkdir(parents=True)

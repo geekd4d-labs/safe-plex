@@ -15,24 +15,26 @@ import json
 import os
 import shutil
 import subprocess
+import sys
 import tempfile
 import zipfile
 
 ROOT = Path(__file__).resolve().parents[1]
-STANDALONE = ROOT / "standalone"
+PROFILE = ROOT / "package"
 NEMESIS_ID = "plex.geekd4dlabs.safe"
 NEMESIS_NAME = "SAFE PLEX"
 SERVICE_NAME = "safe-plex-guard"
-DIST_PREFIX = "safe-plex-standalone"
-REPORT_SUFFIX = "standalone"
-BUILD_LABEL = "standalone (NEMESIS package, no HMG-API dependency)"
-PLEX_SHA256 = "d44d56be3d15b07feb0c034663008c8997765b444b7065c81d1692f02fab239f"
+DIST_PREFIX = "safe-plex"
+REPORT_SUFFIX = "safe-plex"
+BUILD_LABEL = "SAFE PLEX production NEMESIS package (no HMG-API dependency)"
+PLEX_SHA256 = "bdd746d124a3efb3c86ca841c93ec5c2cae599b8c736ec66d96420b5971a3e7b"
 PLEX_CERT_SHA256 = "b7c45789ad339affaecd51ef6be24c63786df75e9c273ac951b1cd1d755c2be0"
 PACKAGE = "com.plexapp.android"
 VERSION_NAME = "6.17.1.5294"
 LAUNCHER = "com.plexapp.plex.activities.SplashActivity"
 STANDALONE_CLASSES = ("StandaloneGuard", "FactoryVehicleTelemetry")
 ZIP_EPOCH = (1980, 1, 1, 0, 0, 0)
+DEFAULT_APK = ROOT / "artifacts" / "Plex-6.17.1.5294-EV6-FULLSCREEN-CA2026-AUDIOSRC.apk"
 
 
 def sha256(path):
@@ -203,9 +205,9 @@ def build_usb(package, usb, version):
     with zipfile.ZipFile(usb, "w", zipfile.ZIP_DEFLATED) as archive:
         zip_bytes(archive, f"Packages/{NEMESIS_ID}.zip", package.read_bytes())
         zip_bytes(archive, "NEMESIS.data",
-                  (STANDALONE / "src" / "USB-NEMESIS.data").read_bytes())
-        zip_bytes(archive, "README-PRIVATE-TEST.txt",
-                  (STANDALONE / "README-PRIVATE-TEST.txt").read_bytes())
+                  (PROFILE / "src" / "USB-NEMESIS.data").read_bytes())
+        zip_bytes(archive, "README.txt",
+                  (PROFILE / "README.txt").read_bytes())
     with zipfile.ZipFile(usb) as archive:
         if archive.testzip() is not None:
             raise ValueError("USB CRC failure")
@@ -226,7 +228,7 @@ def main():
     parser.add_argument("--build-tools-version", default="36.0.0")
     args = parser.parse_args()
 
-    version = (STANDALONE / "VERSION").read_text().strip()
+    version = (PROFILE / "VERSION").read_text().strip()
     sdk = (args.sdk or find_sdk()).resolve()
     jdk = (args.jdk or find_jdk()).resolve()
     build_tools = sdk / "build-tools" / args.build_tools_version
@@ -234,7 +236,7 @@ def main():
     apk = args.apk.resolve()
     verify_plex_apk(apk, build_tools, env)
 
-    nemesis_source = (STANDALONE / "src" / "NEMESIS.data").read_text()
+    nemesis_source = (PROFILE / "src" / "NEMESIS.data").read_text()
     parser = parse_nemesis(nemesis_source)
     if parser.get("nemesis", "package-version") != version:
         raise SystemExit("NEMESIS.data package-version does not match standalone/VERSION")
@@ -255,14 +257,14 @@ def main():
         (stage / "scripts").mkdir()
         # copyfile: byte-exact. write_text would re-encode line endings
         # (CRLF on Windows), corrupting the NEMESIS descriptor on-device.
-        shutil.copyfile(STANDALONE / "src" / "NEMESIS.data", stage / "NEMESIS.data")
+        shutil.copyfile(PROFILE / "src" / "NEMESIS.data", stage / "NEMESIS.data")
         shutil.copyfile(apk, stage / "app" / "Plex.apk")
         shutil.copyfile(guard_jar, stage / "guard" / "safeplex-guard.jar")
-        shutil.copyfile(STANDALONE / "src" / "guard" / "safeplex-guard.sh",
+        shutil.copyfile(PROFILE / "src" / "guard" / "safeplex-guard.sh",
                         stage / "guard" / "safeplex-guard.sh")
-        shutil.copyfile(STANDALONE / "src" / "guard" / "preuninstall.sh",
+        shutil.copyfile(PROFILE / "src" / "guard" / "preuninstall.sh",
                         stage / "guard" / "preuninstall.sh")
-        shutil.copyfile(STANDALONE / "src" / "scripts" / "pre.sh",
+        shutil.copyfile(PROFILE / "src" / "scripts" / "pre.sh",
                         stage / "scripts" / "pre.sh")
         with zipfile.ZipFile(package_zip, "w", zipfile.ZIP_DEFLATED) as archive:
             for path in sorted(stage.rglob("*")):
@@ -287,4 +289,6 @@ def main():
 
 
 if __name__ == "__main__":
+    if "--apk" not in sys.argv:
+        sys.argv.extend(["--apk", str(DEFAULT_APK)])
     main()

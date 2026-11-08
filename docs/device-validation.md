@@ -1,21 +1,41 @@
 # Device validation and safety gate
 
 Target: 2022 US Kia EV6 Gen5W, Android 4.4.2, 1920×720 display.
+Package: `plex.geekd4dlabs.safe` (SAFE PLEX) `1.1.0`.
 
-## Completed while parked
+Items marked **[owner]** were confirmed by the vehicle owner in the car. Items
+without that tag were verified from host tooling or device logs.
+
+## Confirmed on the vehicle
+
+Compatibility, while parked:
 
 - [x] Original APK identity and SHA-256 verified
 - [x] Patched APK v1 signature verified
-- [x] Package installs and launches
+- [x] Installs via NEMESIS from a USB stick and launches **[owner]**
 - [x] `GET_TASKS` OEM crash eliminated
-- [x] Current Plex account login succeeds with legacy MFA concatenation
+- [x] Plex account login succeeds using legacy MFA concatenation
 - [x] Plex library opens
 - [x] Video plays with audio
 - [x] Video retains its source aspect ratio
 - [x] Playback activity removes the OEM top status bar/inset
 - [x] Updated CA bundle removes `libcurl` certificate error 60
+- [x] Pausing or stopping playback no longer restores FM radio; `ModeManagerService`
+      reports `isAvModePackage : com.plexapp.android` after Stop
+- [x] Park → Reverse → Park returns the head unit to its previous source **[owner]**
 
-## Implemented and host-verified
+Park Guard enforcement:
+
+- [x] Park → Reverse stops visible playback
+- [x] Park → Drive stops visible playback
+- [x] Plex stops working once the car is moving **[owner]**
+- [x] Vehicle-service loss terminates a running Plex process, and repeated launch
+      attempts remain blocked
+- [x] Restoring fresh Park telemetry permits Plex again after the safe-state debounce
+- [x] Supervisor restart begins blocked, stops Plex in 2.2 seconds on this head unit,
+      then permits relaunch only after fresh Park telemetry debounces
+
+## Host-verified
 
 - [x] Independent root supervisor starts fail-closed
 - [x] Safe policy requires Park, not moving, near-zero finite speed, and unrestricted state
@@ -24,84 +44,60 @@ Target: 2022 US Kia EV6 Gen5W, Android 4.4.2, 1920×720 display.
 - [x] Enforcement repeats once per second while blocked
 - [x] Primary enforcement uses `am force-stop com.plexapp.android`
 - [x] Bounded timeout falls back to exact package/child-process matching under `/proc`
-- [x] Factory `not_while_driving` remains a second layer
-- [x] Service compiles and dexes for API 19
-- [x] Signed HMG archive and nested USB archive verify recursively
-- [x] Packaged Plex APK bytes match the parked-playback-tested artifact
+- [x] Telemetry mapping is fail-closed: any missing or throwing reading reports `-`
+      and blocks (16 host cases, including the 0/1 policy-encoding contract)
+- [x] Guard jar compiles to a single deterministic `classes.dex`
+- [x] NEMESIS descriptor contract: app + root service, correct paths, `restart` mode
+- [x] Descriptor satisfies the live parser: `types=` plural, `short-desc` ≤ 64 chars
+- [x] Guard script: API 19 + vehicle-framework preflight, boot-id/pid double-start
+      lock, `cleanup` force-stops Plex
+- [x] NEMESIS package and nested USB archive verify recursively; ZIP bytes deterministic
+- [x] Shell scripts ship with LF line endings only
+- [x] Packaged Plex APK bytes match the vehicle-tested artifact
+- [x] Audio focus holder is process-scoped, so a guard force-stop releases it
 
-## Required physical tests before calling it SAFE PLEX
+## Still outstanding
 
-The independent HMG supervisor starts blocked and permits playback only when fresh, valid telemetry proves all of the following:
+None of these are known failures; they are unmeasured.
+
+- [ ] Launch while already in Reverse/Drive cannot survive
+- [ ] Background playback is terminated after shifting out of Park
+- [ ] File/deep-link launch is terminated while out of Park
+- [ ] Head-unit reboot recovers fail-closed (guard restarts via NEMESIS, Plex blocked until Park)
+- [ ] Park → Reverse/Drive event-to-stop latency measured from device timestamps
+- [ ] No unrelated package/process is killed during the physical shift tests
+- [ ] Uninstall via NEMESIS stops the guard, force-stops Plex, and removes `/data/local/safe-plex`
+
+## Safety contract
+
+The supervisor starts blocked and permits playback only when fresh, valid
+telemetry proves all of the following:
 
 - `gear.park == 1`
 - `moving == 0`
-- finite absolute speed is within a documented near-zero tolerance
+- finite absolute speed within a documented near-zero tolerance
 - `driving.restricted == 0`
 
-Missing, malformed, contradictory, stale, or unavailable telemetry is unsafe. Unsafe state must immediately and repeatedly force-stop `com.plexapp.android`, including its services and exact child processes. Keep HMG's stock `not_while_driving` restriction as a second layer.
+Missing, malformed, contradictory, stale, or unavailable telemetry is unsafe.
+Unsafe state must immediately and repeatedly force-stop `com.plexapp.android`,
+including its services and exact child processes.
 
-Physical acceptance tests:
+## Telemetry source
 
-- [x] Park → Reverse stops visible playback
-- [x] Park → Drive stops visible playback
-- [ ] Launch while already in Reverse/Drive cannot survive
-- [ ] Background playback is terminated after shifting out of Park
-- [ ] File/deep-link launch is terminated while out of Park
-- [x] HMG vehicle-service loss terminates a running Plex process and repeated launch attempts remain blocked
-- [x] Restoring fresh Park telemetry permits Plex again after the safe-state debounce
-- [x] Supervisor restart begins blocked, stops Plex in 2.2 seconds on this head unit, then permits relaunch only after fresh Park telemetry debounces
-- [ ] Head-unit reboot recovers fail-closed
-- [ ] Park → Reverse/Drive event-to-stop latency is measured from device timestamps
-- [ ] No unrelated package/process is killed during the physical shift tests
-
-Installed artifact:
-
-```text
-geekd4dlabs-safe-plex 0.1.0
-HMG author key: 96f22dc5-6d6e-8098-bbc9-e554834eb78d
-Mod SHA-256: c1e917476bac28e3fa728ac996bf70d3cf16844928c4c0e624cd4be851014f6b
-```
-
-Remaining gaps before calling the gear-transition matrix complete: cannot-survive launch while already in Reverse/Drive, background/deep-link playback after shifting out of Park, head-unit reboot recovery, measured event-to-stop latency, and confirmation no unrelated process is affected during the shift tests.
-
-## Standalone build (NEMESIS, HMG-API independent)
-
-The standalone package ships the same unmodified EV6 Plex APK plus a root
-guard service (NEMESIS `kind=sh`, `uid=root`, `mode=restart`) that runs
-`StandaloneGuard` under `app_process`. Telemetry comes from the head unit's
-own factory binders — the same services the EV6 Plex video gate uses:
+Readings come from the head unit's own factory binders — the same services the
+EV6 Plex video gate uses:
 
 - `ISystemService.getGearPStatus()` via `/system/framework/automotive.jar`
-- `ITM_HSCANService.getCarSpeed(0)` / `IsCarMoving()` via
-  `/system/framework/com.hkmc.ext.hcan.jar`
+- `ITM_HSCANService.getCarSpeed(0)` / `IsCarMoving()` via `/system/framework/com.hkmc.ext.hcan.jar`
 - `IRegulationManager.getStatus()` via `/system/framework/automotive.jar`
 
-Policy, debounce (1.5 s), enforcement latch, and the enforcement cascade
-(`am force-stop` → `/proc` fallback) are byte-identical to the HMG guard:
-`StandaloneGuard` reuses `SafePlexGuard.enforcePlexStopped()`. Only the
-telemetry source changed. Unanswered readings are reported as `-` and the
-service cache is dropped, so the next poll rebinds from scratch.
+Unanswered readings are reported as `-` and the service cache is dropped, so the
+next poll rebinds from scratch.
 
-### Host-verified (standalone)
+## Retired
 
-- [x] Telemetry mapping is fail-closed: any missing/throwing reading reports `-` and blocks (16 host cases, including the 0/1 policy-encoding contract)
-- [x] `StandaloneGuard` reuses the HMG guard's policy constants and enforcement path
-- [x] Guard jar compiles to a single deterministic `classes.dex` containing both standalone classes
-- [x] NEMESIS descriptor contract: app + root service, correct paths, `restart` mode
-- [x] Guard script: API 19 + vehicle-framework preflight, boot-id/pid double-start lock, `cleanup` force-stops Plex
-- [x] NEMESIS package and nested USB archive verify recursively; ZIP bytes deterministic
-- [x] Shell scripts ship with LF line endings only
-
-### Required physical tests (standalone)
-
-First run must treat the binder path as unvalidated on this unit:
-
-- [ ] logcat shows `started fail-closed supervisor (standalone; factory vehicle telemetry)`
-- [ ] Confirmed parked (P, stopped): Plex launches and plays video
-- [ ] Park → Reverse/Drive stops visible playback; relaunch blocked until fresh Park debounces
-- [ ] Launch while already in Reverse/Drive cannot survive
-- [ ] Background playback is terminated after shifting out of Park
-- [ ] File/deep-link launch is terminated while out of Park
-- [ ] Head-unit reboot recovers fail-closed (guard restarts via NEMESIS, Plex stays blocked until Park)
-- [ ] No unrelated package/process is killed during the shift tests
-- [ ] Uninstall via NEMESIS stops the guard, force-stops Plex, and removes `/data/local/safe-plex`
+The HMG-API mod (`geekd4dlabs-safe-plex` 0.1.0) and the guarded test identity
+`plex.geekd4dlabs.compat-test` (through 0.1.3) were retired at 1.1.0. The
+validation above carries forward because 1.1.0 ships the same guard, scripts, and
+APK bytes as the validated `compat-test` 0.1.3; only the package identity and
+version strings changed.

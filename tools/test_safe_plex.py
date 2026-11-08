@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Host-side contract tests for the standalone (NEMESIS) SAFE PLEX build.
+"""Host-side contract tests for the production SAFE PLEX NEMESIS package.
 
 No Android SDK required: parses the package descriptors, checks the shell
 scripts and Java sources against the validated EV6 pattern, and verifies the
@@ -12,8 +12,8 @@ import zipfile
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
-SRC = ROOT / "standalone" / "src"
-STANDALONE_SRC = ROOT / "standalone"
+SRC = ROOT / "package" / "src"
+PROFILE_SRC = ROOT / "package"
 SERVICE = ROOT / "service" / "src" / "dev" / "geekd4dlabs" / "safeplex"
 ID = "plex.geekd4dlabs.safe"
 
@@ -33,7 +33,7 @@ def check_nemesis_data():
     assert len(parser.get("nemesis", "short-desc")) <= 64, "NEMESIS rejects short-desc over 64 chars"
     assert parser.get("nemesis", "preinstall") == "scripts/pre.sh"
     assert parser.get("nemesis", "preuninstall") == "guard/preuninstall.sh"
-    assert parser.get("nemesis", "package-version") == (STANDALONE_SRC / "VERSION").read_text().strip()
+    assert parser.get("nemesis", "package-version") == (PROFILE_SRC / "VERSION").read_text().strip()
     assert parser.get("app.0", "kind") == "apk"
     assert parser.get("app.0", "path") == "app/Plex.apk"
     assert parser.get("app.0", "package") == "com.plexapp.android"
@@ -130,7 +130,7 @@ def check_telemetry_java():
 
 
 def check_zip_helpers():
-    spec = importlib.util.spec_from_file_location("build_standalone", ROOT / "tools" / "build_standalone.py")
+    spec = importlib.util.spec_from_file_location("build_safe_plex", ROOT / "tools" / "build_safe_plex.py")
     assert spec is not None and spec.loader is not None
     module = importlib.util.module_from_spec(spec)
     spec.loader.exec_module(module)
@@ -146,13 +146,13 @@ def check_zip_helpers():
         usb_a = temp_dir / "usb-a.zip"
         usb_b = temp_dir / "usb-b.zip"
         package.write_bytes(b"fake-package-bytes")
-        version = (STANDALONE_SRC / "VERSION").read_text().strip()
+        version = (PROFILE_SRC / "VERSION").read_text().strip()
         module.build_usb(package, usb_a, version)
         module.build_usb(package, usb_b, version)
         assert usb_a.read_bytes() == usb_b.read_bytes(), "USB packaging must be deterministic"
         with zipfile.ZipFile(usb_a) as archive:
             assert archive.namelist() == [f"Packages/{ID}.zip",
-                                          "NEMESIS.data", "README-PRIVATE-TEST.txt"]
+                                          "NEMESIS.data", "README.txt"]
             assert archive.read(f"Packages/{ID}.zip") == b"fake-package-bytes"
             usb_descriptor = archive.read("NEMESIS.data").decode()
             assert "type=install" in usb_descriptor
