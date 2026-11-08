@@ -89,8 +89,8 @@ python3 tools/build_compat_nemesis.py
 Ready-to-extract USB archive:
 
 ```text
-dist/plex-compat-test-guarded-0.1.0-usb.zip
-SHA-256: 194d7fcf1920310b0297022551645265ef0c194b0db1034c04e5141208e37232
+dist/plex-compat-test-guarded-0.1.1-usb.zip
+SHA-256: bb5b9f7f9e97eed260e18ad0069530b7c30b13973d5db60663689c56ebacc90a
 ```
 
 The inner NEMESIS package is `Packages/plex.geekd4dlabs.compat-test.zip`. Do not install it alongside the HMG-API SAFE PLEX mod or the regular standalone SAFE PLEX package: all variants own `com.plexapp.android`, and concurrent guards or package managers create ambiguous uninstall and process-control behavior. Remove the previous variant through its own manager first.

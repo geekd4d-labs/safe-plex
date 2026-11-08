@@ -29,7 +29,7 @@ INSTALL (USB)
 2. Copy the contents of safe-plex-standalone-0.2.0-usb.zip onto the stick
    so the stick contains:
      Packages/plex.geekd4dlabs.safe.zip
-     USB-NEMESIS.data
+     NEMESIS.data
      README-PRIVATE-TEST.txt
 3. Insert the stick and use NEMESIS on the head unit to install
    plex.geekd4dlabs.safe.

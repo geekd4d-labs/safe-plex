@@ -197,7 +197,7 @@ def verify_package(package, stage, guard_jar, apk):
 def build_usb(package, usb, version):
     with zipfile.ZipFile(usb, "w", zipfile.ZIP_DEFLATED) as archive:
         zip_bytes(archive, f"Packages/{NEMESIS_ID}.zip", package.read_bytes())
-        zip_bytes(archive, "USB-NEMESIS.data",
+        zip_bytes(archive, "NEMESIS.data",
                   (STANDALONE / "src" / "USB-NEMESIS.data").read_bytes())
         zip_bytes(archive, "README-PRIVATE-TEST.txt",
                   (STANDALONE / "README-PRIVATE-TEST.txt").read_bytes())
@@ -206,10 +206,10 @@ def build_usb(package, usb, version):
             raise ValueError("USB CRC failure")
         if archive.read(f"Packages/{NEMESIS_ID}.zip") != package.read_bytes():
             raise ValueError("nested package differs from built package")
-        parser = parse_nemesis(archive.read("USB-NEMESIS.data").decode())
+        parser = parse_nemesis(archive.read("NEMESIS.data").decode())
         if parser.get("nemesis", "type") != "install" \
                 or parser.get("nemesis", "path") != f"Packages/{NEMESIS_ID}.zip":
-            raise ValueError("USB-NEMESIS.data does not point at the package")
+            raise ValueError("USB NEMESIS.data does not point at the package")
 
 
 def main():

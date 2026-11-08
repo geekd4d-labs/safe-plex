@@ -1,4 +1,4 @@
-PLEX COMPAT TEST 0.1.0 (GUARDED NEMESIS TEST)
+PLEX COMPAT TEST 0.1.1 (GUARDED NEMESIS TEST)
 ================================================
 
 PURPOSE
@@ -41,7 +41,7 @@ INSTALL
 Extract the USB ZIP to the USB root. It must contain:
 
   Packages/plex.geekd4dlabs.compat-test.zip
-  USB-NEMESIS.data
+  NEMESIS.data
   README-PRIVATE-TEST.txt
 
 Use NEMESIS to install PLEX COMPAT TEST (GUARDED).

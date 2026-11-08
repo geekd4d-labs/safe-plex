@@ -151,8 +151,11 @@ def check_zip_helpers():
         assert usb_a.read_bytes() == usb_b.read_bytes(), "USB packaging must be deterministic"
         with zipfile.ZipFile(usb_a) as archive:
             assert archive.namelist() == [f"Packages/{ID}.zip",
-                                          "USB-NEMESIS.data", "README-PRIVATE-TEST.txt"]
+                                          "NEMESIS.data", "README-PRIVATE-TEST.txt"]
             assert archive.read(f"Packages/{ID}.zip") == b"fake-package-bytes"
+            usb_descriptor = archive.read("NEMESIS.data").decode()
+            assert "type=install" in usb_descriptor
+            assert f"path=Packages/{ID}.zip" in usb_descriptor
 
 
 def main():
