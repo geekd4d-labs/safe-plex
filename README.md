@@ -5,9 +5,9 @@
 
 Plex Android `6.17.1.5294`, patched for compatible Kia/Hyundai Gen5W head units (Android 4.4.2 / API 19), packaged for NEMESIS with an independent fail-closed Park Guard.
 
-**Current release: `1.2.0`** — one package, `plex.geekd4dlabs.safe`, named **SAFE PLEX**. The HMG-API variant is retired (see [Retired variants](#retired-variants)).
+**Current release: `1.2.1`** — one package, `plex.geekd4dlabs.safe`, named **SAFE PLEX**. The HMG-API variant is retired (see [Retired variants](#retired-variants)).
 
-**Safety status:** the APK and guard behavior come from the `0.1.3` lineage physically exercised on a 2022 US Kia EV6; the `1.2.0` NEMESIS archive has not itself been installed on a vehicle. Ioniq 5 and other Gen5W vehicles are experimental until owner testing confirms both the availability and meaning of their factory telemetry. Missing, throwing, malformed, or unreadable calls fail closed, but a different vehicle could return plausible values with different meanings; physical Park/Reverse/Drive validation is therefore required. EV6 checks are tracked in `docs/device-validation.md`.
+**Safety status:** the APK and guard behavior come from the `0.1.3` lineage physically exercised on a 2022 US Kia EV6; the `1.2.1` NEMESIS archive has not itself been installed on a vehicle. Ioniq 5 and other Gen5W vehicles are experimental until owner testing confirms both the availability and meaning of their factory telemetry. Missing, throwing, malformed, or unreadable calls fail closed, but a different vehicle could return plausible values with different meanings; physical Park/Reverse/Drive validation is therefore required. EV6 checks are tracked in `docs/device-validation.md`.
 
 ## How it works
 
@@ -78,7 +78,7 @@ For the smoothest playback, set your Plex transcode quality to **720p**. Higher 
 
 ## Install
 
-Download `safe-plex-1.2.0-usb.zip` from the release, extract it to the root of a FAT32 USB stick so the stick contains:
+Download `safe-plex-1.2.1-usb.zip` from the release, extract it to the root of a FAT32 USB stick so the stick contains:
 
 ```text
 Packages/plex.geekd4dlabs.safe.zip
@@ -88,7 +88,7 @@ README.txt
 
 Insert the stick and install **SAFE PLEX** through NEMESIS, parked.
 
-Requirements: NEMESIS installed and working; Kia/Hyundai Gen5W Android 4.4.2 / API 19, 32-bit ARM; factory frameworks `/system/framework/automotive.jar` and `/system/framework/com.hkmc.ext.hcan.jar` present. The installer deliberately uses this platform preflight instead of an EV6-only model profile, allowing an Ioniq 5 or another matching Gen5W unit to attempt startup. Missing or unreadable factory calls leave the guard blocked. Plausible readings with different vehicle-specific meanings cannot be detected automatically, so every new model/firmware needs physical gear-state validation.
+Requirements: NEMESIS installed and working; Kia/Hyundai Gen5W Android 4.4.2 / API 19, 32-bit ARM; factory frameworks `/system/framework/automotive.jar` and `/system/framework/com.hkmc.ext.hcan.jar` present. Marketplace metadata marks the physically exercised EV6 260507 firmware as a full match; other CVEV firmware and US Ioniq 5 NEEV/NEEV23 model families are partial/experimental matches. Other model families are incompatible unless the user explicitly accepts NEMESIS's risk override. Missing or unreadable factory calls leave the guard blocked. Plausible readings with different vehicle-specific meanings cannot be detected automatically, so every new model/firmware needs physical gear-state validation.
 
 ### Upgrading from the test package
 
@@ -118,7 +118,7 @@ python3 tools/build_safe_plex.py
 Outputs:
 
 ```text
-dist/safe-plex-1.2.0-usb.zip        USB-root archive
+dist/safe-plex-1.2.1-usb.zip        USB-root archive
 dist/plex.geekd4dlabs.safe.zip      inner NEMESIS package
 dist/SHA256SUMS-safe-plex.txt
 dist/VERIFICATION-safe-plex.json

@@ -30,12 +30,19 @@ def check_nemesis_data():
     assert parser.get("nemesis", "id") == ID
     assert parser.get("nemesis", "name") == "SAFE PLEX"
     assert parser.get("nemesis", "types") == "application,service"
-    assert parser.get("nemesis", "models") == "any"
+    assert parser.get("nemesis", "type") == "application,service"
+    assert parser.get("nemesis", "models") == "cvev_us,neev_us,neev23_us"
+    assert parser.get("nemesis", "os") == "CVEV.USA.0000.V015.012.260507"
+    assert parser.get("nemesis", "depends") == "!plex.geekd4dlabs.compat-test"
     assert len(parser.get("nemesis", "short-desc")) <= 64, "NEMESIS rejects short-desc over 64 chars"
+    assert len(parser.get("nemesis", "detailed-desc")) <= 256, \
+        "NEMESIS 1.1 rejects detailed-desc over 256 chars"
     descriptor = raw.decode()
     assert "Kia/Hyundai Gen5W" in descriptor
-    assert "0.1.3 lineage" in parser.get("nemesis", "detailed-desc")
-    assert "1.2.0 archive has not been vehicle-installed" in parser.get("nemesis", "detailed-desc")
+    assert "0.1.3 runtime" in parser.get("nemesis", "detailed-desc")
+    version = (PROFILE_SRC / "VERSION").read_text().strip()
+    assert f"the {version} archive is not vehicle-installed" in \
+        parser.get("nemesis", "detailed-desc")
     assert "EV6" not in parser.get("nemesis", "short-desc"), \
         "package summary must not select an EV6-only profile"
     assert parser.get("nemesis", "preinstall") == "scripts/pre.sh"

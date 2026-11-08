@@ -167,7 +167,11 @@ def verify_package(package, stage, guard_jar, apk):
             shutil.rmtree(checked, ignore_errors=True)
     expect = {
         "nemesis": {"id": NEMESIS_ID, "name": NEMESIS_NAME,
+                    "type": "application,service",
                     "types": "application,service",
+                    "depends": "!plex.geekd4dlabs.compat-test",
+                    "os": "CVEV.USA.0000.V015.012.260507",
+                    "models": "cvev_us,neev_us,neev23_us",
                     "preinstall": "scripts/pre.sh",
                     "preuninstall": "guard/preuninstall.sh"},
         "app.0": {"kind": "apk", "path": "app/Plex.apk", "package": PACKAGE,
@@ -181,6 +185,9 @@ def verify_package(package, stage, guard_jar, apk):
     short_desc = nemesis.get("nemesis", "short-desc", fallback="")
     if len(short_desc) > 64:
         raise ValueError(f"NEMESIS.data short-desc is {len(short_desc)} chars; max 64")
+    detailed_desc = nemesis.get("nemesis", "detailed-desc", fallback="")
+    if len(detailed_desc) > 256:
+        raise ValueError(f"NEMESIS.data detailed-desc is {len(detailed_desc)} chars; max 256")
     for section, keys in expect.items():
         if not nemesis.has_section(section):
             raise ValueError(f"NEMESIS.data missing section {section}")
