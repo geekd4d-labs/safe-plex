@@ -1,4 +1,4 @@
-SAFE PLEX 1.1.0
+SAFE PLEX 1.2.0
 =================
 
 PARKED USE ONLY. SAFE PLEX is meant for a fully stopped vehicle in Park.
@@ -36,7 +36,7 @@ REQUIREMENTS
 INSTALL (USB)
 
 1. Format a USB stick as FAT32.
-2. Extract safe-plex-1.1.0-usb.zip to the root of the stick, so it contains:
+2. Extract safe-plex-1.2.0-usb.zip to the root of the stick, so it contains:
      Packages/plex.geekd4dlabs.safe.zip
      NEMESIS.data
      README.txt
@@ -90,8 +90,17 @@ and removes /data/local/safe-plex.
 
 NOTES AND LIMITS
 
-- Validated on a 2022 US Kia EV6 (Gen5W). Other models and firmware are
-  untested; treat a first install elsewhere as a validation run.
+- The installer intentionally attempts to run on any Kia/Hyundai Gen5W unit
+  with API 19, 32-bit ARM, and the required factory framework jars. It does
+  not select an EV6-only vehicle profile.
+- The APK and guard behavior come from the 0.1.3 lineage physically exercised
+  on a 2022 US Kia EV6. This 1.2.0 NEMESIS archive has not itself been installed
+  on a vehicle. Ioniq 5 and other models or firmware are experimental until
+  owners report physical validation results.
+- A missing, throwing, malformed, or unreadable vehicle call keeps Plex
+  blocked rather than allowing playback. A different vehicle could return
+  plausible values with different meanings, so testers must physically verify
+  Park, Reverse, and Drive behavior before treating that vehicle as validated.
 - If the factory services do not answer at boot, Plex stays blocked until
   they do. That is the intended fail-closed behavior.
 - This package contains proprietary Plex software. Do not redistribute it,

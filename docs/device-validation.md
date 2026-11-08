@@ -1,7 +1,14 @@
 # Device validation and safety gate
 
 Target: 2022 US Kia EV6 Gen5W, Android 4.4.2, 1920×720 display.
-Package: `plex.geekd4dlabs.safe` (SAFE PLEX) `1.1.0`.
+Physically exercised package lineage: `plex.geekd4dlabs.compat-test` `0.1.3`.
+Current host-built package: `plex.geekd4dlabs.safe` (SAFE PLEX) `1.2.0`.
+
+`1.2.0` has not itself been installed on a vehicle. Its reviewed Plex APK,
+Park Guard behavior, guard scripts, and safety policy carry forward from the
+physically exercised `0.1.3` lineage. Package identity, version, descriptor
+metadata, and documentation differ, so the checks below must not be read as a
+claim that the `1.2.0` archive itself was physically validated.
 
 Items marked **[owner]** were confirmed by the vehicle owner in the car. Items
 without that tag were verified from host tooling or device logs.
@@ -98,6 +105,7 @@ next poll rebinds from scratch.
 
 The HMG-API mod (`geekd4dlabs-safe-plex` 0.1.0) and the guarded test identity
 `plex.geekd4dlabs.compat-test` (through 0.1.3) were retired at 1.1.0. The
-validation above carries forward because 1.1.0 ships the same guard, scripts, and
-APK bytes as the validated `compat-test` 0.1.3; only the package identity and
-version strings changed.
+runtime evidence above applies to the unchanged reviewed APK, guard behavior,
+guard scripts, and safety policy carried into 1.2.0. It does not establish
+physical validation of the 1.2.0 NEMESIS archive, its metadata, or any vehicle
+other than the documented EV6.

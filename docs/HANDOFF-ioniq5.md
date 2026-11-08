@@ -12,7 +12,7 @@ Two things shipped as one NEMESIS package:
 2. **A root Park Guard service** (`safe-plex-guard`) that force-stops Plex
    unless the car's own factory vehicle services prove it is safely parked.
 
-Current release: `1.1.0`, package id `plex.geekd4dlabs.safe`, display name
+Current release: `1.2.0`, package id `plex.geekd4dlabs.safe`, display name
 `SAFE PLEX`. Repo: `/opt/data/projects/Ev6/safe-plex` → GitHub
 `geekd4d-labs/safe-plex` (private).
 
@@ -35,8 +35,11 @@ car is moving just like VLC."* Everything below follows from that.
 - Never ship an in-vehicle artifact without the guard. A bench/emulator-only
   archive exists (`tools/build_compat_test.py`) and must never be installed in
   a car.
-- Do not loosen the compatibility gate to make another vehicle "just work."
-  Add a separate profile and physically validate it.
+- The owner chose a shared Kia/Hyundai Gen5W platform preflight rather than an
+  EV6-only profile. Matching API 19 / 32-bit ARM units with the required factory
+  jars may attempt startup. Never weaken the telemetry policy: missing,
+  incompatible, or unreadable calls must remain blocked, and every additional
+  vehicle stays experimental until physically validated.
 
 ## Build environment
 
@@ -181,7 +184,9 @@ below is verified.** Treat every item as an open question.
    the previous source the same way. If not, the audio patch may be unnecessary.
 6. **NEMESIS version.** Re-check the descriptor constraints against whatever
    version is installed.
-7. **Compatibility gate.** Add a new profile rather than widening the existing one.
+7. **Compatibility gate.** The package intentionally uses a shared Gen5W
+   platform preflight. Record each tested vehicle/firmware separately; do not
+   convert telemetry failures into an allowed state.
 
 Suggested order: confirm framework/binder availability and encodings **before**
 building any package. A guard that cannot read the vehicle is safe but useless,
@@ -200,9 +205,10 @@ and that is the most likely failure mode.
 
 ## Honest status
 
-- `1.1.0` is published but **has not itself been installed on a vehicle.** It is a
-  byte-for-byte rebuild of the validated `compat-test` 0.1.3 with only the package
-  identity and version strings changed. The car currently runs `0.1.3`.
+- `1.2.0` is a host-built multi-vehicle package and **has not itself been installed
+  on a vehicle.** Its Plex APK, guard JAR behavior, guard scripts, and safety policy
+  carry forward from the validated `compat-test` 0.1.3 lineage; package metadata,
+  documentation, identity, and version differ. The car currently runs `0.1.3`.
 - Owner-confirmed on the EV6: install from USB works, playback works, the FM radio
   regression is gone, Park → Reverse → Park restores the previous source, and Plex
   stops working once the car is moving.

@@ -30,7 +30,14 @@ def check_nemesis_data():
     assert parser.get("nemesis", "id") == ID
     assert parser.get("nemesis", "name") == "SAFE PLEX"
     assert parser.get("nemesis", "types") == "application,service"
+    assert parser.get("nemesis", "models") == "any"
     assert len(parser.get("nemesis", "short-desc")) <= 64, "NEMESIS rejects short-desc over 64 chars"
+    descriptor = raw.decode()
+    assert "Kia/Hyundai Gen5W" in descriptor
+    assert "0.1.3 lineage" in parser.get("nemesis", "detailed-desc")
+    assert "1.2.0 archive has not been vehicle-installed" in parser.get("nemesis", "detailed-desc")
+    assert "EV6" not in parser.get("nemesis", "short-desc"), \
+        "package summary must not select an EV6-only profile"
     assert parser.get("nemesis", "preinstall") == "scripts/pre.sh"
     assert parser.get("nemesis", "preuninstall") == "guard/preuninstall.sh"
     assert parser.get("nemesis", "package-version") == (PROFILE_SRC / "VERSION").read_text().strip()

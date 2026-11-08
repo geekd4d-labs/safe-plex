@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Build and recursively verify the standalone (HMG-API independent) SAFE PLEX package.
 
-The package is a NEMESIS package for the EV6 head unit: the EV6 Plex APK plus a
+The package is a NEMESIS package for compatible Kia/Hyundai Gen5W units: the Plex APK plus a
 root guard service (app_process + StandaloneGuard) that reads the head unit's
 own factory vehicle services. Deterministic: fixed ZIP timestamps, sorted
 entries, recursive byte verification of every nested artifact.
@@ -26,7 +26,7 @@ NEMESIS_NAME = "SAFE PLEX"
 SERVICE_NAME = "safe-plex-guard"
 DIST_PREFIX = "safe-plex"
 REPORT_SUFFIX = "safe-plex"
-BUILD_LABEL = "SAFE PLEX production NEMESIS package (no HMG-API dependency)"
+BUILD_LABEL = "SAFE PLEX Kia/Hyundai Gen5W NEMESIS package (no HMG-API dependency)"
 PLEX_SHA256 = "bdd746d124a3efb3c86ca841c93ec5c2cae599b8c736ec66d96420b5971a3e7b"
 PLEX_CERT_SHA256 = "b7c45789ad339affaecd51ef6be24c63786df75e9c273ac951b1cd1d755c2be0"
 PACKAGE = "com.plexapp.android"
