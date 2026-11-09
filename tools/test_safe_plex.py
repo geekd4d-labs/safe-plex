@@ -39,10 +39,11 @@ def check_nemesis_data():
         "NEMESIS 1.1 rejects detailed-desc over 256 chars"
     descriptor = raw.decode()
     assert "Kia/Hyundai Gen5W" in descriptor
-    assert "0.1.3 runtime" in parser.get("nemesis", "detailed-desc")
-    version = (PROFILE_SRC / "VERSION").read_text().strip()
-    assert f"the {version} archive is not vehicle-installed" in \
-        parser.get("nemesis", "detailed-desc")
+    detailed_desc = parser.get("nemesis", "detailed-desc")
+    assert "fail-closed Park Guard" in detailed_desc
+    assert "Ioniq 5 support is experimental" in detailed_desc
+    assert "0.1.3 runtime" not in detailed_desc
+    assert "archive is not vehicle-installed" not in detailed_desc
     assert "EV6" not in parser.get("nemesis", "short-desc"), \
         "package summary must not select an EV6-only profile"
     assert parser.get("nemesis", "preinstall") == "scripts/pre.sh"
